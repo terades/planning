@@ -78,4 +78,4 @@
 	.mat-on-time { color: var(--color-on-time); }
 	.mat-warn { color: var(--color-warn); }
 	.mat-danger { color: var(--color-no); }
-</style>S
+</style>
