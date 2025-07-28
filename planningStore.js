@@ -2,10 +2,10 @@
 import { writable, get } from 'svelte/store';
 
 //======================================================================
-// HILFSFUNKTIONEN & KONSTANTEN (früher in utils.js)
+// HILFSFUNKTIONEN & KONSTANTEN (frÃ¼her in utils.js)
 //======================================================================
 
-export const alleRessourcen = ['Schirmer 1', 'Vorfertigung', 'AWE-Linie', 'Türen-Linie', 'Fenster-Linie'];
+export const alleRessourcen = ['Schirmer 1', 'Vorfertigung', 'AWE-Linie', 'TÃ¼ren-Linie', 'Fenster-Linie'];
 const today = new Date('2025-06-23T10:00:00'); 
 
 function getCalendarWeek(date) {
@@ -74,7 +74,7 @@ function createDefaultCapacities() {
 	const defaults = [];
 	const resourcesWithCapacity = [
 		{ resource: 'Schirmer 1', capacity: 20 }, { resource: 'Vorfertigung', capacity: 20 },
-		{ resource: 'AWE-Linie', capacity: 40 }, { resource: 'Türen-Linie', capacity: 30 },
+		{ resource: 'AWE-Linie', capacity: 40 }, { resource: 'TÃ¼ren-Linie', capacity: 30 },
 		{ resource: 'Fenster-Linie', capacity: 35 },
 	];
 	for (let day = 1; day <= 5; day++) { resourcesWithCapacity.forEach(rc => { defaults.push({ type: 'default', dayOfWeek: day, ...rc, status: 'Produktiv' }); }); }
@@ -84,7 +84,7 @@ function createDefaultCapacities() {
 }
 
 //======================================================================
-// STORES & METHODEN (früher in planningStore.js)
+// STORES & METHODEN (frÃ¼her in planningStore.js)
 //======================================================================
 
 export const cards = writable(Array(30).fill(null).map((_, i) => ({ id: `BTL${String(i + 1).padStart(5, '0')}`, ...generateItemDetails(i, 'board') })));
@@ -110,7 +110,7 @@ export function navigateToPreviousWeek() { const options = get(weekOptions); con
 export function navigateToNextWeek() { const options = get(weekOptions); const currentIndex = options.findIndex(o => o.identifier === get(selectedWeekIdentifier)); if (currentIndex > -1 && currentIndex < options.length - 1) { selectedWeekIdentifier.set(options[currentIndex + 1].identifier); } }
 export function handleDragStart(event, type, item) { draggingElement.set({ type, item }); event.dataTransfer.effectAllowed = 'move'; event.dataTransfer.setData('text/plain', item.id); }
 export function handleDrop() { const dragging = get(draggingElement); if (!dragging) return; const itemToMove = dragging.item; if (dragging.type === 'backlog') { draftBacklogItems.update(items => items.filter(i => i.id !== itemToMove.id)); const [year, week] = get(selectedWeekIdentifier).split('-').map(Number); const newItem = { ...itemToMove, startDate: getWeekStartDate(year, week).toISOString().split('T')[0], status: 'Verplant' }; draftCards.update(items => { const targetIndex = items.findIndex(c => c.id === get(dropTargetId)); if (targetIndex !== -1) { items.splice(get(dropAfter) ? targetIndex + 1 : targetIndex, 0, newItem); } else { items.push(newItem); } return items; }); } else if (dragging.type === 'card') { draftCards.update(items => { const fromIndex = items.findIndex(c => c.id === itemToMove.id); if (fromIndex === -1) return items; const [draggedItem] = items.splice(fromIndex, 1); const targetIndex = items.findIndex(c => c.id === get(dropTargetId)); if (targetIndex !== -1) { items.splice(get(dropAfter) ? targetIndex + 1 : targetIndex, 0, draggedItem); } else { items.push(draggedItem); } return items; }); } hasPendingChanges.set(true); }
-export function handleDragEnd() { draggingElement.set(null); dropTargetId.set(null); dropAfter.set(null); }
+export function handleDragEnd() { draggingElement.set(null); dropTargetId.set(null); dropAfter.set(false); }
 export function handleCardDragOver(event, cardId) { event.preventDefault(); event.stopPropagation(); const dragging = get(draggingElement); if (!dragging || dragging.item.id === cardId) return; const rect = event.currentTarget.getBoundingClientRect(); const isAfter = event.clientY > (rect.top + rect.height / 2); if (get(dropTargetId) !== cardId || get(dropAfter) !== isAfter) { dropTargetId.set(cardId); dropAfter.set(isAfter); } }
 export function handleBoardDragOver(event) { event.preventDefault(); if (get(draggingElement) && !event.target.closest('.card')) { dropTargetId.set(null); dropAfter.set(false); } }
 export function handleDragLeaveContainer(event) { if (!event.currentTarget.contains(event.relatedTarget)) { dropTargetId.set(null); dropAfter.set(false); } }
